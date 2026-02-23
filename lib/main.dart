@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/home_page.dart';
@@ -5,13 +7,20 @@ import 'package:taskplanner/db/db.dart';
 
 void main() async {
     WidgetsFlutterBinding.ensureInitialized();
+    
+    try {
+        // For Linux / Windows / macOS
+        if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+          sqfliteFfiInit();
+          databaseFactory = databaseFactoryFfi;
+        }
+        
+        await Db.database; // Creates DB
+        runApp(const TaskPlanner());
 
-    // For Linux / Windows / macOS
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-
-    await Db.database; // Creates DB
-    runApp(const TaskPlanner());
+    } catch (e, st) {
+        print('DB Init error: $e\n$st');
+    }
 }
 
 class TaskPlanner extends StatelessWidget {
