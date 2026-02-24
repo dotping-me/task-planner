@@ -30,7 +30,10 @@ class TaskPlanner extends StatelessWidget {
     Widget build(BuildContext context) {
         return MaterialApp(
             title: 'Task Planner',
-            theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+
+            // Add switchable themes later? I don't know
+            // theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+            
             home: const HomePage(),
         );
     }
