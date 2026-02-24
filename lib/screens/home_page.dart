@@ -7,18 +7,31 @@ import 'package:taskplanner/widgets/add_task_dialog_widget.dart';
 import 'package:taskplanner/widgets/tree_view_widget.dart';
 
 class HomePage extends StatefulWidget {
-    const HomePage({super.key});
+    final String? initialUsername; // Parsed from TaskPlanner (Root)
+    const HomePage({super.key, this.initialUsername});
 
     @override
     State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+    String? _username; // Metadata, sort of
+
     List<TreeNode> tree = [];
+    int? selectedCategoryId;
 
     @override
     void initState() {
         super.initState();
+
+        // Setup username
+        _username = widget.initialUsername;
+        if (_username == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showNameDialog();
+            });
+        }
+
         loadTree();
     }
 
@@ -54,6 +67,48 @@ class _HomePageState extends State<HomePage> {
     // -------------------
     //   Dialog Handlers
     // -------------------
+
+    // 'Username' Dialog
+    void _showNameDialog() {
+        final controller = TextEditingController();
+
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+                return AlertDialog(
+                    title: const Text('Welcome!'),
+
+                    content: TextField(
+                        controller: controller,
+                        decoration: const InputDecoration(
+                            labelText: 'Enter your name',
+                        ),
+                    ),
+
+                    actions: [
+                        ElevatedButton(
+                            onPressed: () async {
+                                final name = controller.text.trim();
+                    
+                                if (name.isNotEmpty) {
+                                    await Db.saveUsername(name);
+
+                                    setState(() {
+                                        _username = name;
+                                    });
+
+                                    Navigator.of(context).pop();
+                                }
+                            },
+
+                            child: const Text('Continue'),
+                        ),
+                    ],
+                );
+            },
+        );
+    }
     
     // Show 'Add Category' Dialog
     void _showAddCategoryDialog(BuildContext context) {
@@ -110,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(width: 10.0),
 
                             // Name displayed
-                            Text('Hi, User!', 
+                            Text(_username != null ? 'Hello, $_username!' : 'Hello!', 
                             style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),),
                         ],),
 
@@ -123,7 +178,19 @@ class _HomePageState extends State<HomePage> {
                     // Tree-view Display Container
                     // I want rounded corners here but just for the top
 
-                    Expanded(child: Container(
+                    Expanded(child: GestureDetector(
+                        
+                        // Reset last clicked node when clicked outside
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                            setState(() {
+                                selectedCategoryId = null;
+                            });
+                        },
+
+                        child: Container(
+                            
+                        // I'm too lazy to redo all the indentation below
                         decoration: const BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.only(
@@ -190,14 +257,24 @@ class _HomePageState extends State<HomePage> {
                                 child: tree.isEmpty
                                 ? const Center(child: Text("No categories or tasks yet"))
                                 : SingleChildScrollView(child: 
+                
                                     TreeViewWidget(
                                         nodes: tree,
                                         reload: loadTree,
+
+                                        // Track last clicked node
+                                        selectedNodeId: selectedCategoryId,
+                                        onSelect: (id) {
+                                            setState(() {
+                                            selectedCategoryId = id;
+                                            });
+                                        },
                                     ),
+
                                 ),
                             ),
 
-                        ],),)
+                        ],),))
                     ),]
                 )
             )

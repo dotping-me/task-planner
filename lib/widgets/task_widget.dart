@@ -15,26 +15,70 @@ class TaskWidget extends StatelessWidget {
 
     @override
     Widget build(BuildContext context) {
-        return Card(
-            child: ListTile(
-                leading: Checkbox(
-                    value: task.status,
-                    onChanged: (_) => onToggle(),
-                ),
+        Theme.of(context);
 
-                title: Text(
-                    task.title,
-                    style: TextStyle(
-                    decoration: task.status ? TextDecoration.lineThrough : null,
+        return Container(
+            margin: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+
+            decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: Colors.grey.withValues(alpha: 0.15),
+                ),
+            ),
+
+
+            child: Row(children: [
+                
+                // Checkbox
+                SizedBox(
+                    height: 24,
+                    width: 24,
+                    
+                    child: Checkbox(
+                        value: task.status,
+                        onChanged: (_) => onToggle(),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                        ),
                     ),
                 ),
 
-                trailing: IconButton(
-                    icon: const Icon(Icons.delete),
+                const SizedBox(width: 12),
+
+                // Display task details
+                Expanded(
+                    child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: task.status
+                                ? Colors.grey[500] // Grey when completed
+                                : Colors.grey[900],
+                            decoration:
+                                task.status ? TextDecoration.lineThrough : null,
+                        ),
+
+                        child: Text(task.title),
+                    ),
+                ),
+
+                // Delete button
+                IconButton(
+                    icon: Icon(
+                        Icons.close,
+                        size: 18,
+                        color: Colors.grey[400],
+                    ),
+
+                    splashRadius: 18,
                     onPressed: onDelete,
                 ),
-                
-            ),
+            ],),
         );
     }
 }

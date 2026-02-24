@@ -18,3 +18,10 @@ CREATE TABLE Task (
     FOREIGN KEY (Category) REFERENCES Category(ID) ON DELETE CASCADE
 );
 ''';
+
+const String createSettingsTable = '''
+CREATE TABLE Settings (
+    Key   TEXT PRIMARY KEY,
+    Value TEXT
+)
+''';

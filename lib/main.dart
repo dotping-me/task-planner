@@ -16,7 +16,9 @@ void main() async {
         }
         
         await Db.database; // Creates DB
-        runApp(const TaskPlanner());
+
+        final username = await Db.getUsername();
+        runApp(TaskPlanner(initialUsername: username));
 
     } catch (e, st) {
         print('DB Init error: $e\n$st');
@@ -24,7 +26,8 @@ void main() async {
 }
 
 class TaskPlanner extends StatelessWidget {
-    const TaskPlanner({super.key});
+    final String? initialUsername;
+    const TaskPlanner({super.key, this.initialUsername});
 
     @override
     Widget build(BuildContext context) {
@@ -33,8 +36,8 @@ class TaskPlanner extends StatelessWidget {
 
             // Add switchable themes later? I don't know
             // theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
-            
-            home: const HomePage(),
+
+            home: HomePage(initialUsername: initialUsername),
         );
     }
 }

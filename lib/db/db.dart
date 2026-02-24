@@ -28,12 +28,40 @@ class Db {
             onCreate: (db, version) async {
                 await db.execute(createCategoryTable);
                 await db.execute(createTaskTable);
+                await db.execute(createSettingsTable);
             },
 
             onOpen: (db) async {
                 await db.execute("PRAGMA foreign_keys = ON;");
             }
         );
+    }
+
+    // -------------------------
+    //   Handlers for settings
+    // -------------------------
+
+    static Future<void> saveUsername(String name) async {
+        final db = await database;
+
+        await db.insert(
+            'Settings',
+            {'Key': 'username', 'Value': name},
+            conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+    }
+
+    static Future<String?> getUsername() async {
+        final db = await database;
+
+        final result = await db.query(
+            'Settings',
+            where: 'Key = ?',
+            whereArgs: ['username'],
+        );
+
+        if (result.isEmpty) return null;
+        return result.first['Value'] as String?;
     }
 
     // ----------------------------------------------
