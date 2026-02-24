@@ -21,7 +21,13 @@ void main() async {
         runApp(TaskPlanner(initialUsername: username));
 
     } catch (e, st) {
-        print('DB Init error: $e\n$st');
+
+        // Error State
+        runApp(MaterialApp(
+            home: Scaffold(
+                body: Center(child: Text('DB Init error: $e\n$st')),
+            ),
+        ));
     }
 }
 
