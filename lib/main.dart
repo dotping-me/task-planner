@@ -23,6 +23,8 @@ void main() async {
     } catch (e, st) {
 
         // Error State
+        // TODO: Turn this into a proper page
+        
         runApp(MaterialApp(
             home: Scaffold(
                 body: Center(child: Text('DB Init error: $e\n$st')),
